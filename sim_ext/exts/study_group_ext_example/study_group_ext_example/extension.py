@@ -1,4 +1,8 @@
 # extension.py 
+
+# Extension Tutorial
+# Credits: Sirens
+
 import omni.ext 
 import omni.ui as ui 
 from .utils import multiply # Import from utils.py 
