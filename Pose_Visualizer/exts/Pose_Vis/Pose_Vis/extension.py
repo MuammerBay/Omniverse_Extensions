@@ -64,9 +64,11 @@ class Pose_Vis(omni.ext.IExt):
             with ui.HStack():
                 # Left side controls (fixed width)
                 with ui.VStack(width=200):
+                    self.create_description()
                     self.create_controls()
                     self.create_frame_section()
                     self.create_credit_info()
+
 
 
                 # Right side image (fills remaining space)
@@ -79,6 +81,13 @@ class Pose_Vis(omni.ext.IExt):
                         }
                     )
 
+
+    def create_description(self):
+        with ui.Frame(style=self.frame_style):
+            with ui.VStack(spacing=1, height=1):
+                ui.Label("3D Pose Visualizer\n", style=self.header_style)
+                ui.Label("Select an output folder based on PoseWriter()\nExample Doc:\n'Pose Estimation Synthetic Data Generation'", style=self.label_style)
+                self.file_label = ui.Label("", style=self.label_style)
 
     def create_controls(self):
         with ui.Frame(style=self.frame_style):
@@ -114,7 +123,6 @@ class Pose_Vis(omni.ext.IExt):
                 }
             )
 
-
     def visualize_image_with_json(self, image_file, json_file):
         try:
             fig, ax = plt.subplots(figsize=(8, 6))
@@ -122,7 +130,6 @@ class Pose_Vis(omni.ext.IExt):
             ax.imshow(img)
             ax.axis("off")
             ax.set_title("3D Poses of Objects")
-
 
             # Reset all object containers and labels
             for container in self.object_containers:
@@ -132,8 +139,6 @@ class Pose_Vis(omni.ext.IExt):
 
             # Extract frame number from the file name
             frame_num = os.path.splitext(os.path.basename(image_file))[0]
-
-            print("Hello")
 
             # Load JSON data
             with open(json_file, "r") as jf:
@@ -146,7 +151,7 @@ class Pose_Vis(omni.ext.IExt):
 
             if not objects:
                 print(f"Warning: No objects found in JSON for frame {frame_num}")
-                # Still save and display the image even without objects
+                # Save and display the image even without objects
                 temp_dir = tempfile.gettempdir()
                 self.temp_plot_path = os.path.join(temp_dir, f"plot_{os.getpid()}_{self.current_index}.png")
                 fig.savefig(self.temp_plot_path, bbox_inches="tight", dpi=100, pad_inches=0)
@@ -155,7 +160,7 @@ class Pose_Vis(omni.ext.IExt):
                 if os.path.exists(self.temp_plot_path):
                     self.plot_widget.source_url = self.temp_plot_path
                 return
-            
+
             # Define keypoint connections for a cuboid
             connections = [
                 (0, 1), (1, 2), (2, 3), (3, 0),  # Front face
@@ -166,26 +171,35 @@ class Pose_Vis(omni.ext.IExt):
             # Predefined vivid colors for classes
             vivid_colors = ["red", "blue", "green", "orange", "purple"]
             colors = {}
+            visibility_map = {}  # Store max visibility for each class
             unique_classes = []
 
             for obj in objects:
-                class_name = obj.get("class")
+                class_name = obj.get("class", "Unknown")
+                visibility = obj.get("visibility", 0)  # Get visibility or default to 0
+
                 if class_name not in colors:
                     colors[class_name] = vivid_colors[len(colors) % len(vivid_colors)]
                     unique_classes.append(class_name)  # Add to unique classes for the legend
+                    visibility_map[class_name] = visibility
+                else:
+                    # Update max visibility for the class
+                    visibility_map[class_name] = max(visibility_map[class_name], visibility)
 
                 cuboid = obj.get("projected_cuboid", [])
                 if len(cuboid) < 8:
                     continue
 
+                # Draw cuboid connections
                 for start, end in connections:
                     x = [cuboid[start][0], cuboid[end][0]]
                     y = [cuboid[start][1], cuboid[end][1]]
                     ax.plot(x, y, 'o-', color=colors[class_name])
 
-            # Create a legend
+            # Create a legend with visibility information
             handles = [
-                plt.Line2D([0], [0], color=colors[cls], lw=2, label=cls.replace("_", " "))
+                plt.Line2D([0], [0], color=colors[cls], lw=2, 
+                        label=f"{cls.replace('_', ' ')} (Visib.: {visibility_map[cls]:.2f})")
                 for cls in unique_classes
             ]
             ax.legend(handles=handles, loc="upper right", title="Classes")
