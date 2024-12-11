@@ -12,7 +12,7 @@ A beginner-friendly guide for extensions from Scott Dempsey (Sirens) for the Omn
 ---
 
 ## 2. Extension: Pose_Vis - SDG 3 Bounding Box Viewer
-The 3D Pose Visualizer extension built on top of the "SDG 2D bounding box metadata viewer extension. (Credits: Scott Dempsey (Sirens))" 
+The 3D Pose Visualizer extension built on top of the "SDG 2D bounding box metadata viewer extension" (from Scott Dempsey (Sirens))
 
 This tool allows users to:
 - Visualize 3D poses of objects using bounding boxes projected onto images.
