@@ -20,7 +20,4 @@ This tool allows users to:
 - Interact with an intuitive UI for navigating through frames.
 
 ### Visual Previews:
-<div style="display: flex; justify-content: space-around; align-items: center;">
-  <img src="images/pose_vis1.png" alt="Pose Vis Preview 1" width="400" style="margin-right: 10px;"/>
-  <img src="images/pose_vis2.png" alt="Pose Vis Preview 2" width="350"/>
-</div>
+![Pose Vis Preview](images/pose_vis1.png.png)
