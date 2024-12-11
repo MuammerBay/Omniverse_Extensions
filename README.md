@@ -20,4 +20,4 @@ This tool allows users to:
 - Interact with an intuitive UI for navigating through frames.
 
 ### Visual Previews:
-![Pose Vis Preview](images/pose_vis1.png.png)
+![Pose Vis Preview](images/pose_vis1.png)
